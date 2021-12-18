@@ -1,11 +1,13 @@
-main.exe: main.cpp utils.o str.o
-	clang++ main.cpp utils.o str.o -o main.exe
+CXXFLAGS=-std=c++11
+
+program.exe: main.cpp utils.o str.o
+	clang++ $(CXXFLAGS) main.cpp utils.o str.o -o program.exe
 
 str.o: str.cpp str.h
-	clang++ -c str.cpp -o str.o
+	clang++ $(CXXFLAGS) -c str.cpp -o str.o
 
 utils.o: utils.cpp utils.h
-	clang++ -c utils.cpp -o utils.o
+	clang++ $(CXXFLAGS) -c utils.cpp -o utils.o
 
 clean:
-	rm -f *.o main.exe
+	rm -f *.o *.exe

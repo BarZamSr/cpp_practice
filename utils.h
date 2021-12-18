@@ -3,7 +3,7 @@
 
 namespace utils
 {
-	void copy(char*, char*, int);
+	void copy(const char*, char*, int);
 }
 
 #endif
