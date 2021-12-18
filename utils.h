@@ -1,8 +1,7 @@
 #ifndef UTILS
 #define UTILS
 
-namespace utils
-{
+namespace utils {
 	void copy(const char*, char*, int);
 }
 

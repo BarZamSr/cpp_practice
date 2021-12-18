@@ -1,13 +1,12 @@
 #pragma once
 
-class String
-{
+class String {
 public:
 	String();
 	String(int);
 	String(const char*);
 	String(const char*, int);
-	String(String*);
+	String(String&);
 
 	friend std::ostream& operator<< (std::ostream&, const String&);
 protected:
@@ -16,4 +15,3 @@ protected:
 };
 
 std::ostream& operator<< (std::ostream&, String const&);
-
