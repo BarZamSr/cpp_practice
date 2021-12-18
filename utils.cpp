@@ -16,3 +16,17 @@ void utils::copy(const char* src, char* dst, int len) {
 		dst[i] = src[i];
 	}
 }
+
+int utils::c_str_len(char const* c_str) {
+	assert(c_str != NULL);
+
+	char c;
+	int i = 0;
+
+	do {
+		c = c_str[i];
+		i++;
+	} while (c != '\0');
+
+	return i-1;
+}
