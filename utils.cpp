@@ -5,15 +5,13 @@
 #include "utils.h"
 
 namespace utils {
-	void copy(const char* src, char* dst, int len) {
+	template <class T>
+	void copy(T const* src, T* dst, int len) {
 		assert(src != NULL);
 		assert(len >= 0);
 		assert(len == 0 || dst != NULL);
 
 		for(int i=0; i<len; i++) {
-			if(src[i] == '\0') {
-				std::cerr << "WARNING: Copying null terminator character\n";
-			}
 			dst[i] = src[i];
 		}
 	}

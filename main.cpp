@@ -1,12 +1,13 @@
 #include <iostream>
 
 #include "utils.h"
+#include "list.h"
 #include "str.h"
 
 int main() {
-	String str = "the quick brown fox jumps over the lazy dog";
+	int array[3] = {1, 2, 3};
 
-	std::cout << String("Hello world").is_alpha();
+	std::cout << List<int>(array, 3);
 
 	std::cout << '\n';
 	return 0;
