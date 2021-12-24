@@ -3,11 +3,16 @@
 template <class T>
 class List {
 public:
+	// constructors/destructor
 	List();
 	List(int);
+	List(std::initializer_list<T>);
 	List(const T*, int);
 	List(List<T> const&);
 	~List();
+
+	// getters/setters
+	int getLen() const;
 
 	int find(T);
 	int find(T, int);
@@ -19,8 +24,9 @@ public:
 	List<List<T>> split(T);
 
 	T& operator[] (int);
-	T* begin() const;
-	T* end() const;
+	T const& operator[] (int) const;
+	T const* begin() const;
+	T const* end() const;
 
 	friend List<T> operator+ (List<T> const&, List<T> const&);
 	friend List<T> operator* (List<T> const&, int);
@@ -35,5 +41,3 @@ List<T> operator+ (List<T> const&, List<T> const&);
 
 template <class T>
 List<T> operator* (List<T> const&, int);
-
-#include "list.cpp"

@@ -1,8 +1,6 @@
-#ifndef UTILS
-#define UTILS
+#pragma once
 
 #define ERR_VAL -1
-#define ACII_LEN 128
 
 namespace utils {
 	template <class T>
@@ -13,7 +11,3 @@ namespace utils {
 	bool is_num(char);
 	bool is_whitespace(char);
 }
-
-#include "utils.cpp"
-
-#endif

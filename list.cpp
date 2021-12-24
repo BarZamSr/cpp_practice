@@ -2,7 +2,7 @@
 #include <iostream>
 #include <cassert>
 
-#include "utils.h"
+#include "utils.cpp"
 #include "list.h"
 
 template <class T>
@@ -12,7 +12,6 @@ List<T>::List() {
 	len = 0;
 	cap = 0;
 }
-
 template <class T>
 List<T>::List(int n): List() {
 	assert(n >= 0);
@@ -23,7 +22,11 @@ List<T>::List(int n): List() {
 		cap = n;
 	}
 }
-
+template <class T>
+List<T>::List(std::initializer_list<T> A): List(A.size()) {
+	len = A.size();
+	utils::copy(A.begin(), array, A.size());
+}
 template <class T>
 List<T>::List(T const* A, int n): List(n) {
 	assert(A != NULL);
@@ -31,7 +34,6 @@ List<T>::List(T const* A, int n): List(n) {
 	utils::copy(A, array, n);
 	len = n;
 }
-
 template <class T>
 List<T>::List(List const& other): List(other.cap) {
 	len = other.len;
@@ -41,10 +43,14 @@ List<T>::List(List const& other): List(other.cap) {
 		utils::copy(other.array, this->array, other.len);
 	}
 }
-
 template <class T>
 List<T>::~List() {
 	delete[] array;
+}
+
+template <class T>
+int List<T>::getLen() const {
+	return len;
 }
 
 template <class T>
@@ -103,7 +109,7 @@ List<List<T>> List<T>::split(T c) {
 }
 
 template <class T>
-T & List<T>::operator[] (int index) {
+T& List<T>::operator[] (int index) {
 	if(index < 0) {
 		assert(0-index <= len);
 		return array[len + index];
@@ -114,11 +120,22 @@ T & List<T>::operator[] (int index) {
 	}
 }
 template <class T>
-T* List<T>::begin() const {
+T const& List<T>::operator[] (int index) const {
+	if(index < 0) {
+		assert(0-index <= len);
+		return array[len + index];
+	}
+	else {
+		assert(index < len);
+		return array[index];
+	}
+}
+template <class T>
+T const* List<T>::begin() const {
 	return array;
 }
 template <class T>
-T* List<T>::end() const {
+T const* List<T>::end() const {
 	return array + len;
 }
 
@@ -155,8 +172,12 @@ List<T> operator* (List<T> const& src, int n) {
 
 template <class T>
 std::ostream & operator<< (std::ostream & stream, List<T> const& list) {
-	for(auto element: list) {
-		stream << element;
+	int i;
+
+	stream << '[';
+	for(i=0; i<list.getLen()-1; i++) {
+		stream << list[i] << ", ";
 	}
+	stream << list[i] << ']';
 	return stream;
 }

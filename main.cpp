@@ -2,13 +2,11 @@
 
 #include "utils.h"
 #include "list.h"
-#include "str.h"
+#include "list.cpp"
 
 int main() {
-	int array[3] = {1, 2, 3};
-
-	std::cout << List<int>(array, 3);
-
-	std::cout << '\n';
+	for(auto element: List<int>({1, 2, 3})) {
+		std::cout << element << '\n';
+	}
 	return 0;
 }
