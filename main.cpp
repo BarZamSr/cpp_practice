@@ -1,12 +1,26 @@
 #include <iostream>
 
-#include "utils.h"
-#include "list.h"
 #include "list.cpp"
 
-int main() {
-	for(auto element: List<int>({1, 2, 3})) {
-		std::cout << element << '\n';
+class Test {
+public:
+	Test() {
+		std::cout << '+' << ++id << std::endl;
 	}
+	~Test() {
+		std::cout << '-' << id << std::endl;
+	}
+private:
+	static int id;
+};
+
+Test function() {
+	Test * retval = new Test();
+	return * retval;
+}
+
+int main() {
+	// std::cout << List<int>({1, 2, 3}) * 2 << std::endl;
+	
 	return 0;
 }

@@ -1,8 +1,11 @@
+#ifndef UTILS
+#define UTILS
+
 #include <cstddef>
 #include <iostream>
 #include <cassert>
 
-#include "utils.h"
+#define ERR_VAL -1
 
 namespace utils {
 	template <class T>
@@ -41,3 +44,5 @@ namespace utils {
 		return c == ' ' || c == '\t' || c == '\n';
 	}
 }
+
+#endif
