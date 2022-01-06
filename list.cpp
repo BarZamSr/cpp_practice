@@ -10,93 +10,61 @@
 template <class T>
 class List {
 public:
-	List() {
-		std::cout << '+' << std::endl;
-		array = NULL;
-		len = 0;
-		cap = 0;
-	}
-	List(int n): List() {
-		assert(n >= 0);
-
-		if (n > 0) {
-			array = new T[n];
-			len = 0;
-			cap = n;
-		}
+	List(): List(utils::Fibonacci::bigger_than(0)) {
+		// hmmm
 	}
 	List(std::initializer_list<T> A): List(A.size()) {
 		len = A.size();
 		utils::copy(A.begin(), array, A.size());
 	}
-	List(T const* A, int n): List(n) {
+	List(const T * A, int n): List(n) {
 		assert(A != NULL);
 
 		utils::copy(A, array, n);
 		len = n;
 	}
-	List(List const& other): List(other.cap) {
+	List(const List & other): List(other.cap) {
+		assert(other.len >= 0);
+
+		len = other.len;
+		if (len != 0) {
+			utils::copy(other.array, array, len);
+		}
+	}
+	List(const List && other): List(other.cap) {
 		len = other.len;
 
-		if (other.len != 0) {
-			assert(other.len > 0 && other.array != NULL);
-			utils::copy(other.array, this->array, other.len);
+		if (len != 0) {
+			assert(len > 0);
+			utils::copy(other.array, array, len);
 		}
 	}
 	~List() {
-		delete[] array;
+		std::free(array);
 	}
 
-	int getLen() const {
+	int get_len() const {
 		return len;
 	}
-
-	int find(T object) {
-		return find(object, 0, len);
+	int get_cap() const {
+		return cap;
 	}
-	int find(T object, int start) {
-		return find(object, start, len);
-	}
-	int find(T object, int start, int end) {
-		assert(end <= len);
-		for(int i = start; i < end; i++) {
-			if (array[i] == object) return i;
-		}
-		return ERR_VAL;
-	}
-	int find(List const& subList) {
-		return find(subList, 0, len);
-	}
-	int find(List const& subList, int start) {
-		return find(subList, start, len);
-	}
-	int find(List const& subList, int start, int end) {
-		for(int i=0; i<len; i++) {
-			for(int j=0; i+j<len; j++) {
-				if(j == subList.len) return i;
-				if(array[i+j] != subList[j]) break;
-			}
-		}
-		return ERR_VAL;
+	int is_empty() const {
+		return len == 0;
 	}
 
-	List<List<T>> split(T c) {
-		List<List<T>> subLists;
+	friend void swap(List<T> & A, List<T> & B) {
+		using std::swap; // enable ADL
 
-		int curr=find(c), last=0;
-		while(curr != ERR_VAL) {
-			subLists.append(
-				List(array+last, curr-last)
-			);
+		swap(A.array, B.array);
+		swap(A.len, B.len);
+		swap(A.cap, B.cap);
+	}
 
-			last = curr+1;
-			curr = find(c, last);
-		}
-		subLists.append(
-			List(array+last, len-last)
-		);
-
-		return subLists;
+	// now featuring the copy-and-swap idiom!
+	List<T> & operator= (List<T> other) {
+		swap(*this, other);
+		return *this;
 	}
 
 	// element access
@@ -120,25 +88,51 @@ public:
 			return array[index];
 		}
 	}
-	T const* begin() const {
+	const T * begin() const {
 		return array;
 	}
-	T const* end() const {
+	const T * end() const {
 		return array + len;
 	}
 
-	List<T> operator+ (T element) {
-		List<T> sum(len + 1);
-		return sum;
+	int find(T object) {
+		return find(object, 0, len);
+	}
+	int find(T object, int start) {
+		return find(object, start, len);
+	}
+	int find(T object, int start, int end) {
+		assert(end <= len);
+		for(int i = start; i < end; i++) {
+			if (array[i] == object) return i;
+		}
+		return ERR_VAL;
 	}
 
-	List<T> operator+ (List<T> const& other) {
-		List<T> sum(len + other.len);
-		sum.array = new T[sum.len];
+	void push(T object) {
+		if (len == cap) {
+			expand();
+		}
+		array[len++] = object;
+	}
+	T pop() {
+		if (len < utils::Fibonacci::smaller_than(cap)) {
+			shrink();
+		}
+		return array[--len];
+	}
 
-		utils::copy(array, sum.array, len);
-		utils::copy(other.array, sum.array + len, other.len);
+	void operator+= (const List<T> & other) {
+		if (cap < len + other.len) {
+			expand_above(len + other.len);
+		}
+		utils::copy(other.array, array+len, other.len);
+		len += other.len;
+	}
 
+	List<T> operator+ (const List<T> & other) {
+		List<T> sum(*this);
+		sum += other;
 		return sum;
 	}
 
@@ -146,34 +140,67 @@ public:
 		assert(n > 0);
 
 		List<T> product(len * n);
-
-		for(int i=0; i<n; i++) {
-			utils::copy(
-				array,
-				product.array + (len * i),
-				len
-			);
-		}
-
 		product.len = len * n;
 
+		for(int i=0; i<n; i++) {
+			utils::copy(array,
+				product.array + (len * i), len);
+		}
 		return product;
 	}
-private:
+
+	friend std::ostream & operator<< (std::ostream & stream,
+						const List<T> & list) {
+		int i;
+		stream << '[';
+		for(i=0; i<list.get_len()-1; i++) {
+			stream << list[i] << ", ";
+		}
+		stream << list[i] << ']';
+		return stream;
+	}
+protected:
 	T* array;
 	int len, cap;
+
+	List(int n) {
+		assert(n > 0);
+		n = utils::Fibonacci::bigger_than(n);
+
+		len = 0;
+		cap = n;
+		array = static_cast<T *> (
+			std::malloc(n * sizeof(T))
+		);
+	}
+
+	void expand_above(int n) {
+		assert(n >= cap);
+		n = utils::Fibonacci::bigger_than(n);
+
+		cap = n;
+		array = static_cast<T *> (
+			std::realloc(array, n * sizeof(T))
+		);
+	}
+	void expand() {
+		expand_above(cap);
+	}
+
+	void shrink_below(int n) {
+		assert(n <= cap);
+		n = utils::Fibonacci::smaller_than(n);
+		assert(n >= len);
+
+		cap = n;
+		array = static_cast<T *> (
+			std::realloc(array, n * sizeof(T))
+		);
+	}
+	void shrink() {
+		shrink_below(cap);
+	}
 };
 
-template <class T>
-std::ostream & operator<< (std::ostream & stream, List<T> const& list) {
-	int i;
-
-	stream << '[';
-	for(i=0; i<list.getLen()-1; i++) {
-		stream << list[i] << ", ";
-	}
-	stream << list[i] << ']';
-	return stream;
-}
 
 #endif
