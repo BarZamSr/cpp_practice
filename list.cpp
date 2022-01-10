@@ -10,7 +10,7 @@
 template <class T>
 class List {
 public:
-	List(): List(utils::Fibonacci::bigger_than(0)) {
+	List(): List(0) {
 		// hmmm
 	}
 	List(std::initializer_list<T> A): List(A.size()) {
@@ -24,6 +24,7 @@ public:
 		len = n;
 	}
 	List(const List & other): List(other.cap) {
+		//LOG("List(other)");
 		assert(other.len >= 0);
 
 		len = other.len;
@@ -32,6 +33,7 @@ public:
 		}
 	}
 	List(const List && other): List(other.cap) {
+		assert(0 == 1);
 		len = other.len;
 
 		if (len != 0) {
@@ -40,6 +42,7 @@ public:
 		}
 	}
 	~List() {
+		// LOG("~List()");
 		std::free(array);
 	}
 
@@ -116,7 +119,7 @@ public:
 		array[len++] = object;
 	}
 	T pop() {
-		if (len < utils::Fibonacci::smaller_than(cap)) {
+		if (len < utils::fib_before(cap)) {
 			shrink();
 		}
 		return array[--len];
@@ -128,12 +131,6 @@ public:
 		}
 		utils::copy(other.array, array+len, other.len);
 		len += other.len;
-	}
-
-	List<T> operator+ (const List<T> & other) {
-		List<T> sum(*this);
-		sum += other;
-		return sum;
 	}
 
 	List<T> operator* (int n) {
@@ -148,6 +145,9 @@ public:
 		}
 		return product;
 	}
+
+	template <typename x> // x is what T is made of (e.g. char, string)
+	T join(x c);
 
 	friend std::ostream & operator<< (std::ostream & stream,
 						const List<T> & list) {
@@ -164,8 +164,10 @@ protected:
 	int len, cap;
 
 	List(int n) {
-		assert(n > 0);
-		n = utils::Fibonacci::bigger_than(n);
+		// LOG("List(n)");
+		assert(n >= 0);
+		n = std::max(n, MIN_LIST_SIZE);
+		n = utils::fib_after(n-1); // at least n
 
 		len = 0;
 		cap = n;
@@ -176,7 +178,7 @@ protected:
 
 	void expand_above(int n) {
 		assert(n >= cap);
-		n = utils::Fibonacci::bigger_than(n);
+		n = utils::fib_after(n);
 
 		cap = n;
 		array = static_cast<T *> (
@@ -189,7 +191,7 @@ protected:
 
 	void shrink_below(int n) {
 		assert(n <= cap);
-		n = utils::Fibonacci::smaller_than(n);
+		n = utils::fib_before(n);
 		assert(n >= len);
 
 		cap = n;
@@ -202,5 +204,11 @@ protected:
 	}
 };
 
+// non-member function to allow copying left operand by value during function call
+template <class T>
+List<T> operator+ (List<T> left, const List<T> & right) {
+	left += right;
+	return left;
+}
 
 #endif

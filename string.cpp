@@ -5,6 +5,9 @@
 
 class String: public List<char> {
 public:
+	String(): List<char>() {
+		// hmmm
+	}
 	String(const char * c_str): List<char>(c_str, utils::c_str_len(c_str)) {
 		// hmmm
 	}
@@ -35,21 +38,25 @@ public:
 		return ERR_VAL;
 	}
 */
-	List<String> split(char c = ' ') {
+	List<String> split(char c) {
 		List<String> sub_strings;
 
 		int curr = find(c), last=0;
 		while(curr != ERR_VAL) {
-			sub_strings.push(
-				String(array+last, curr-last)
-			);
+			if (curr != last) { // skip empty strings
+				sub_strings.push(
+					String(array+last, curr-last)
+				);
+			}
 
 			last = curr+1;
 			curr = find(c, last);
 		}
-		sub_strings.push(
-			String(array+last, len-last)
-		);
+		if (len != last) { // skip empty strings
+			sub_strings.push(
+				String(array+last, curr-last)
+			);
+		}
 
 		return sub_strings;
 	}
@@ -67,5 +74,18 @@ private:
 		// hmmm
 	}
 };
+
+// opposite of the split function
+template<>
+template<>
+String List<String>::join(char c) {
+	String sum;
+	for(auto & s: *this) {
+		sum += s;
+		sum.push(c);
+	}
+	assert(sum.pop() == c);
+	return sum;
+}
 
 #endif

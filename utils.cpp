@@ -1,13 +1,14 @@
 #ifndef UTILS
 #define UTILS
 
+#include <iostream>
 
 #include <cstddef>
-#include <iostream>
+#include <cmath>
 #include <cassert>
 
 #define ERR_VAL -1
-#define FIB_LIM 100
+#define MIN_LIST_SIZE 8
 
 #define LOG(x) std::cout << x << std::endl
 
@@ -49,54 +50,35 @@ namespace utils {
 		return c == ' ' || c == '\t' || c == '\n';
 	}
 
-	// singleton
-	class Fibonacci {
-	public:
-		Fibonacci(Fibonacci & other) = delete;
-		void operator= (const Fibonacci & other) = delete;
+	int nth_fib(int n) {
+		assert(n >= 0);
 
-		static int bigger_than(int n) {
-			int i = place_in_sequence(n);
-			if(i == ERR_VAL) return ERR_VAL;
+		float Phi = (1 + sqrt(5)) / 2;
+		float phi = (1 - sqrt(5)) / 2;
 
-			return sequence[i];
-		}
-		static int smaller_than(int n) {
-			int i = place_in_sequence(n);
-			assert(i != ERR_VAL);
-			if (i == 0) return sequence[0];
-			return sequence[i - 1];
-		}
-	private:
-		static Fibonacci * me;
-		static int sequence[FIB_LIM];
+		return (pow(Phi, n) - pow(phi, n)) / sqrt(5);
+	}
+	int fib_before(int n) {
+		assert(n > 0);
 
-		Fibonacci() {
-			assert(sequence[0] == 0);
-
-			sequence[0] = 8;
-			sequence[1] = 13;
+		int fib=0, last_fib;
+		for(int i=0; fib < n; i++) {
+			last_fib = fib;
+			fib = nth_fib(i);
 		}
 
-		static int place_in_sequence(int n) {
-			if(me == nullptr) {
-				me = new Fibonacci();
-			}
-			for(int i=0; i<FIB_LIM; i++) {
-				if(sequence[i] == 0) {
-					sequence[i] = sequence[i-1] +
-							sequence[i-2];
-				}
-				if(sequence[i] >= n) {
-					return i;
-				}
-			}
-			return ERR_VAL;
-		}
-	};
+		return last_fib;
+	}
+	int fib_after(int n) {
+		assert(n >= 0);
 
-	Fibonacci * Fibonacci::me = nullptr;
-	int Fibonacci::sequence[FIB_LIM] = {0};
+		int fib=0;
+		for(int i=0; fib <= n; i++) {
+			fib = nth_fib(i);
+		}
+
+		return fib;
+	}
 }
 
 #endif
