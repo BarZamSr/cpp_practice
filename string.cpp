@@ -3,12 +3,39 @@
 
 #include "list.cpp"
 
+namespace {
+	int c_str_len(char const* c_str) {
+		assert(c_str != NULL);
+
+		char c;
+		int i = 0;
+
+		do {
+			c = c_str[i];
+			i++;
+		} while (c != '\0');
+
+		return i-1;
+	}
+
+	bool is_num(char c) {
+		return c >= '0' && c <= '9';
+	}
+	bool is_alpha(char c) {
+		return  (c >= 'a' && c <= 'z') ||
+			(c >= 'A' && c <= 'Z');
+	}
+	bool is_whitespace(char c) {
+		return c == ' ' || c == '\t' || c == '\n';
+	}
+}
+
 class String: public List<char> {
 public:
 	String(): List<char>() {
 		// hmmm
 	}
-	String(const char * c_str): List<char>(c_str, utils::c_str_len(c_str)) {
+	String(const char * c_str): List<char>(c_str, c_str_len(c_str)) {
 		// hmmm
 	}
 	String(const char * A, int n): List<char>(A, n) {

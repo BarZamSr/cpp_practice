@@ -2,10 +2,60 @@
 #define LIST
 
 #include <cstdlib>
-#include <iostream>
+#include <cassert>
+#include <cmath>
 #include <cassert>
 
-#include "utils.cpp"
+#include <iostream>
+
+#include "logger.cpp"
+
+#define ERR_VAL -1
+#define MIN_LIST_SIZE 8
+
+namespace {
+	template <class T>
+	void copy(const T * source, T * destination, int length) {
+		assert(source != nullptr);
+		assert(destination != nullptr);
+		assert(length > 0);
+
+		const void * src = static_cast<const void *>(source);
+		void * dest = static_cast<void *>(destination);
+		std::size_t count = length * sizeof(T);
+		std::memcpy(dest, src, count);
+	}
+
+	int nth_fib(int n) {
+		assert(n >= 0);
+
+		float Phi = (1 + sqrt(5)) / 2;
+		float phi = (1 - sqrt(5)) / 2;
+
+		return (pow(Phi, n) - pow(phi, n)) / sqrt(5);
+	}
+	int fib_before(int n) {
+		assert(n > 0);
+
+		int fib=0, last_fib;
+		for(int i=0; fib < n; i++) {
+			last_fib = fib;
+			fib = nth_fib(i);
+		}
+
+		return last_fib;
+	}
+	int fib_after(int n) {
+		assert(n >= 0);
+
+		int fib=0;
+		for(int i=0; fib <= n; i++) {
+			fib = nth_fib(i);
+		}
+
+		return fib;
+	}
+}
 
 template <class T>
 class List {
@@ -15,12 +65,12 @@ public:
 	}
 	List(std::initializer_list<T> A): List(A.size()) {
 		len = A.size();
-		utils::copy(A.begin(), array, A.size());
+		copy(A.begin(), array, A.size());
 	}
 	List(const T * A, int n): List(n) {
 		assert(A != NULL);
 
-		utils::copy(A, array, n);
+		copy(A, array, n);
 		len = n;
 	}
 	List(const List & other): List(other.cap) {
@@ -29,7 +79,7 @@ public:
 
 		len = other.len;
 		if (len != 0) {
-			utils::copy(other.array, array, len);
+			copy(other.array, array, len);
 		}
 	}
 	List(const List && other): List(other.cap) {
@@ -38,7 +88,7 @@ public:
 
 		if (len != 0) {
 			assert(len > 0);
-			utils::copy(other.array, array, len);
+			copy(other.array, array, len);
 		}
 	}
 	~List() {
@@ -119,7 +169,7 @@ public:
 		array[len++] = object;
 	}
 	T pop() {
-		if (len < utils::fib_before(cap)) {
+		if (len < fib_before(cap)) {
 			shrink();
 		}
 		return array[--len];
@@ -129,7 +179,7 @@ public:
 		if (cap < len + other.len) {
 			expand_above(len + other.len);
 		}
-		utils::copy(other.array, array+len, other.len);
+		copy(other.array, array+len, other.len);
 		len += other.len;
 	}
 
@@ -140,7 +190,7 @@ public:
 		product.len = len * n;
 
 		for(int i=0; i<n; i++) {
-			utils::copy(array,
+			copy(array,
 				product.array + (len * i), len);
 		}
 		return product;
@@ -167,7 +217,7 @@ protected:
 		// LOG("List(n)");
 		assert(n >= 0);
 		n = std::max(n, MIN_LIST_SIZE);
-		n = utils::fib_after(n-1); // at least n
+		n = fib_after(n-1); // at least n
 
 		len = 0;
 		cap = n;
@@ -178,7 +228,7 @@ protected:
 
 	void expand_above(int n) {
 		assert(n >= cap);
-		n = utils::fib_after(n);
+		n = fib_after(n);
 
 		cap = n;
 		array = static_cast<T *> (
@@ -191,7 +241,7 @@ protected:
 
 	void shrink_below(int n) {
 		assert(n <= cap);
-		n = utils::fib_before(n);
+		n = fib_before(n);
 		assert(n >= len);
 
 		cap = n;
