@@ -1,3 +1,10 @@
+"""
+hi I wanted to make a wrapper function over matplotlib.pyplot
+but I gave up because the weird state machine format that
+it already has is clearly better than passing a hundred arguments
+into a single function call.
+"""
+
 from numpy import arange
 from matplotlib import pyplot as plt
 from math import sin
@@ -7,8 +14,9 @@ def plot():
     fig, ax = plt.subplots()
 
     plt.plot(x, y)
-    plt.xticks(x)
-    plt.yticks([i for i in range(-15000, 15000, 1000)])
+    #plt.xticks(x)
+    #plt.yticks([i for i in range(-15000, 15000, 1000)])
+
     fig.suptitle("Mass Haul Diagram",
                 fontsize=30, fontweight='bold', **title_font)
     ax.grid()
@@ -32,8 +40,25 @@ def plot():
     plt.show()
 
 if __name__ == "__main__":
-    x = [n for n in arange(-10, 10, 0.1)]
-    y = [pow(n, 2) for n in x]
+    x_vals = [n for n in arange(-10, 10, 0.1)]
+    y_vals = [pow(n, 2) for n in x]
 
-    plot(x, y, "x", "y", "idk man",
-         20, "light", )
+    plot(title = ["hi I am a title", "x_large", "bold", "Apple Chancery"],
+         x_vals = x_vals,
+         x_axis = []
+         x = {
+            "values": x_vals,
+            "label": "x",
+            "size": 20,
+            "weight": "bold",
+            "font":
+        }, y = {
+            "values": y_vals,
+            "label": "y",
+            "size": 50,
+            "weight": "bold",
+            "font": "Bradley Hand"
+        }
+         y = {"y axis label": y},
+         label_size = 20, label_weight = "bold", label_font = "Apple Chancery",
+         title_size = 50, label_weight = "bold", title_font = )
